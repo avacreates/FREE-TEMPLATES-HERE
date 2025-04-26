@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Free Templates</title>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .promo-container {
+      background: #ffffff;
+      padding: 50px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      width: 400px;
+      text-align: center;
+      position: relative;
+    }
+    input, button {
+      width: 100%;
+      padding: 18px;
+      margin-top: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 20px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      font-size: 22px;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    h2 {
+      font-size: 32px;
+      margin-bottom: 25px;
+      color: #333;
+    }
+    .message {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 22px;
+    }
+    .payment-details {
+      margin-top: 30px;
+      font-size: 20px;
+      background-color: #e8f5e9;
+      padding: 20px;
+      border-radius: 12px;
+      display: none;
+    }
+    #slotsLeft {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #555;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 16px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+<div class="promo-container">
+  <h2>Free Templates</h2>
+  
+  <form id="promoForm">
+    <input type="email" id="email" placeholder="Enter your email" required>
+    <button type="submit">Claim</button>
+  </form>
+  
+  <div class="message" id="message"></div>
+  <div id="slotsLeft"></div>
+  
+  <div class="payment-details" id="paymentDetails">
+    <p><strong>YOUR FREE TEMPLATE WILL BE SENT TO YOUR REGISTERED EMAIL</strong></p>
+  </div>
+
+  <div class="footer">AVA CREATION PH</div>
+</div>
+
+<script>
+  // Initialize EmailJS
+  emailjs.init('_YRJStyHBNbt3YwG1');
+
+  const maxSlots = 20;
+  let slotsClaimed = 0;
+  const registeredEmails = []; // Store registered emails
+
+  const form = document.getElementById('promoForm');
+  const message = document.getElementById('message');
+  const slotsLeft = document.getElementById('slotsLeft');
+  const paymentDetails = document.getElementById('paymentDetails');
+
+  updateSlots();
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const emailInput = document.getElementById('email').value.trim().toLowerCase(); // Normalize email
+
+    if (!emailInput) {
+      message.style.color = 'red';
+      message.textContent = 'Please enter a valid email address.';
+      return;
+    }
+
+    if (slotsClaimed >= maxSlots) {
+      showNoMoreSlots();
+      return;
+    }
+
+    if (registeredEmails.includes(emailInput)) {
+      message.style.color = 'red';
+      message.textContent = 'This email has already claimed a free template.';
+      return;
+    }
+
+    // Send email notification
+    emailjs.send('avacreationph', 'template_kyrzsxv', {
+      user_email: emailInput,
+      to_email: 'avacreationph@gmail.com',
+      registered_email: emailInput
+    })
+    .then(function(response) {
+      console.log('Notification sent!', response.status, response.text);
+      registeredEmails.push(emailInput); // Save the email
+      slotsClaimed++;
+      message.style.color = 'green';
+      message.innerHTML = 'You have <strong>successfully claimed</strong> a free template!';
+      updateSlots();
+      form.reset();
+      
+      paymentDetails.style.display = 'block';
+
+      if (slotsClaimed >= maxSlots) {
+        setTimeout(showNoMoreSlots, 1500); // After showing success for 1.5 sec
+      }
+
+    }, function(error) {
+      console.error('Failed to send notification.', error);
+      message.style.color = 'red';
+      message.textContent = 'Error. Please try again later.';
+    });
+  });
+
+  function updateSlots() {
+    if (slotsClaimed >= maxSlots) {
+      showNoMoreSlots();
+    } else {
+      slotsLeft.textContent = `Slots remaining: ${maxSlots - slotsClaimed}`;
+    }
+  }
+
+  function showNoMoreSlots() {
+    form.style.display = 'none';
+    slotsLeft.style.display = 'none';
+    paymentDetails.style.display = 'none';
+    message.style.color = 'red';
+    message.textContent = 'SORRY, NO MORE SLOT';
+  }
+</script>
+
+</body>
+</html>
